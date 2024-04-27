@@ -146,3 +146,6 @@ def aes_decryption(cipher: bytes, key: bytes) -> bytes:
     add_round_key(state, key_schedule, round=0)
 
     return bytes_from_state(state)
+
+# Calliope encryption ---------------------------------------------------------------------------------
+
