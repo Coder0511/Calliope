@@ -10,4 +10,4 @@ Requirements:
 
 Enjoy.
 
-Some of the functions code for AES implementation were obtained from Cyrill Gössi's repo: https://github.com/cgossi/fundamental_cryptography_with_python
+Some of the functions code for AES implementation were obtained from Cyrill Gössi's repo: https://github.com/cgossi/fundamental_cryptography_with_python 
