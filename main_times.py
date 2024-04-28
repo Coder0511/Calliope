@@ -25,3 +25,4 @@ if __name__ == "__main__":
     end = time.time()
     print(f"Calliope random test passed: {calliope_deciphered_random == plaintext}")
     print(f"Time: {end-start} seconds")
+    
