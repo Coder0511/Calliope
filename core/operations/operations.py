@@ -268,21 +268,74 @@ def calliope_static_decryption(cipher: bytes, key: bytes) -> bytes:
 
 # Calliope random encryption ---------------------------------------------------------------------------------
 
-def calliope_random_decryption(data: bytes, key: bytes, selected: [int]) -> bytes: # type: ignore
+def get_x_operation(value: int):
+    if value == 1:
+        return 'shift_rows'
+    elif value == 2:
+        return 'swap_rows'
+    elif value == 3:
+        return 'shift_columns'
+    return 'swap_columns'
+def get_y_operation(value: int):
+    if value == 1:
+        return 'mix_columns'
+    return 'mix_rows'
+
+def calliope_random_encryption(data: bytes, key: bytes, selected: [int]) -> bytes: # type: ignore
     state = state_from_bytes(data)
     key_schedule = key_expansion(key)
     add_round_key(state, key_schedule, round=0)
     
     rounds = 10
     
+    x_string = get_x_operation([selected[0]])
+    y_string = get_y_operation([selected[1]])
+    
     for round in range (1, rounds):
         sub_bytes(state)
-        shift_rows(state)
-        mix_columns(state)
+        globals()[x_string](state)
+        globals()[y_string](state)
         add_round_key(state, key_schedule, round)
         
     sub_bytes(state)
-    shift_rows(state)
+    globals()[x_string](state)
     add_round_key(state, key_schedule, round=rounds)
     
+    return bytes_from_state(state)
+
+# Calliope random decryption ---------------------------------------------------------------------------------
+
+def get_inv_x_operation(value: int):
+    if value == 1:
+        return 'inv_shift_rows'
+    elif value == 2:
+        return 'inv_swap_rows'
+    elif value == 3:
+        return 'inv_shift_columns'
+    return 'inv_swap_columns'
+def get_inv_y_operation(value: int):
+    if value == 1:
+        return 'inv_mix_columns'
+    return 'inv_mix_rows'
+
+def calliope_random_decryption(cipher: bytes, key: bytes, selected: [int]) -> bytes: # type: ignore
+    rounds = 10
+
+    state = state_from_bytes(cipher)
+    key_schedule = key_expansion(key)
+    add_round_key(state, key_schedule, round=rounds)
+    
+    inv_x_string = get_inv_x_operation([selected[0]])
+    inv_y_string = get_inv_y_operation([selected[1]])
+
+    for round in range(rounds-1, 0, -1):
+        globals()[inv_x_string](state)
+        inv_sub_bytes(state)
+        add_round_key(state, key_schedule, round)
+        globals()[inv_y_string](state)
+
+    globals()[inv_x_string](state)
+    inv_sub_bytes(state)
+    add_round_key(state, key_schedule, round=0)
+
     return bytes_from_state(state)
