@@ -1,9 +1,13 @@
-from .sub_byte_strings import sub_byte_box_string, inv_sub_byte_box_string, s_box, inv_s_box
+from .sub_byte_strings import s_box, inv_s_box
+from copy import deepcopy
 
-# AES Encryption ---------------------------------------------------------------------------------
+# Key operations ---------------------------------------------------------------------------------
 
 def state_from_bytes(data: bytes) -> [[int]]: # type: ignore
     return [data[i*4:(i+1)*4] for i in range(len(data) // 4)]
+
+def bytes_from_state(state: [[int]]) -> bytes: # type: ignore
+    return bytes(state[0] + state[1] + state[2] + state[3])
 
 def rotate_word(word: [int]) -> [int]: # type: ignore
     return word[1:] + word[:1]
@@ -38,6 +42,8 @@ def add_round_key(state: [[int]], key_schedule: [[int]], round: int): # type: ig
     round_key = key_schedule[round]
     for row in range(len(state)):
         state[row] = [state[row][column] ^ round_key[row][column] for column in range(len(state[0]))]
+        
+# AES Encryption operations ---------------------------------------------------------------------------------
 
 def sub_bytes(state: [[int]]): # type: ignore
     for row in range(len(state)):
@@ -66,8 +72,7 @@ def mix_columns(state: [[int]]): # type: ignore
     for row in state:
         mix_column(row)
 
-def bytes_from_state(state: [[int]]) -> bytes: # type: ignore
-    return bytes(state[0] + state[1] + state[2] + state[3])
+# AES Encryption ---------------------------------------------------------------------------------
 
 def aes_encryption(data: bytes, key: bytes) -> bytes:
     state = state_from_bytes(data)
@@ -88,7 +93,7 @@ def aes_encryption(data: bytes, key: bytes) -> bytes:
     
     return bytes_from_state(state)
 
-# AES Decryption ---------------------------------------------------------------------------------
+# AES Decryption operations ---------------------------------------------------------------------------------
 
 def inv_sub_bytes(state: [[int]]): # type: ignore
     for row in range(len(state)):
@@ -127,7 +132,9 @@ def inv_mix_columns(state: [[int]]) -> [[int]]: # type: ignore
     for row in state:
         inv_mix_column(row)
     mix_columns(state)
-    
+
+# AES Decryption ---------------------------------------------------------------------------------
+
 def aes_decryption(cipher: bytes, key: bytes) -> bytes:
     rounds = 10
 
@@ -147,5 +154,135 @@ def aes_decryption(cipher: bytes, key: bytes) -> bytes:
 
     return bytes_from_state(state)
 
-# Calliope encryption ---------------------------------------------------------------------------------
+# Calliope encryption operations ---------------------------------------------------------------------------------
 
+def shift_columns(state: [[int]]): # type: ignore
+    state[0][1], state[1][1], state[2][1], state[3][1] = state[3][1], state[0][1], state[1][1], state[2][1]
+    state[0][2], state[1][2], state[2][2], state[3][2] = state[2][2], state[3][2], state[0][2], state[1][2]
+    state[0][3], state[1][3], state[2][3], state[3][3] = state[1][3], state[2][3], state[3][3], state[0][3]
+    
+def swap_columns(state: [[int]]): # type: ignore
+    state[0][0], state[0][1], state[0][2], state[0][3] = state[0][3], state[0][0], state[0][1], state[0][2]
+    state[1][0], state[1][1], state[1][2], state[1][3] = state[1][3], state[1][0], state[1][1], state[1][2]
+    state[2][0], state[2][1], state[2][2], state[2][3] = state[2][3], state[2][0], state[2][1], state[2][2]
+    state[3][0], state[3][1], state[3][2], state[3][3] = state[3][3], state[3][0], state[3][1], state[3][2]
+    
+def swap_rows(state: [[int]]): # type: ignore
+    state[0], state[1], state[2], state[3] = state[3], state[0], state[1], state[2]
+    
+def columns_to_rows(state: [[int]]): # type: ignore
+    temporal_list = deepcopy(state)
+    state[0][0], state[0][1], state[0][2], state[0][3] = temporal_list[0][0], temporal_list[1][0], temporal_list[2][0], temporal_list[3][0]
+    state[1][0], state[1][1], state[1][2], state[1][3] = temporal_list[0][1], temporal_list[1][1], temporal_list[2][1], temporal_list[3][1]
+    state[2][0], state[2][1], state[2][2], state[2][3] = temporal_list[0][2], temporal_list[1][2], temporal_list[2][2], temporal_list[3][2]
+    state[3][0], state[3][1], state[3][2], state[3][3] = temporal_list[0][3], temporal_list[1][3], temporal_list[2][3], temporal_list[3][3]
+
+def rows_to_columns(state: [[int]]): # type: ignore
+    temporal_list = deepcopy(state)
+    state[0][0], state[1][0], state[2][0], state[3][0] = temporal_list[0][0], temporal_list[0][1], temporal_list[0][2], temporal_list[0][3]
+    state[0][1], state[1][1], state[2][1], state[3][1] = temporal_list[1][0], temporal_list[1][1], temporal_list[1][2], temporal_list[1][3]
+    state[0][2], state[1][2], state[2][2], state[3][2] = temporal_list[2][0], temporal_list[2][1], temporal_list[2][2], temporal_list[2][3]
+    state[0][3], state[1][3], state[2][3], state[3][3] = temporal_list[3][0], temporal_list[3][1], temporal_list[3][2], temporal_list[3][3]
+
+def mix_rows(state: [[int]]): # type: ignore
+    columns_to_rows(state)
+    mix_columns(state)
+    rows_to_columns(state)
+
+# Calliope decryption operations ---------------------------------------------------------------------------------
+
+def inv_shift_columns(state: [[int]]): # type: ignore
+    state[3][1], state[0][1], state[1][1], state[2][1] = state[0][1], state[1][1], state[2][1], state[3][1]
+    state[2][2], state[3][2], state[0][2], state[1][2] = state[0][2], state[1][2], state[2][2], state[3][2]
+    state[1][3], state[2][3], state[3][3], state[0][3] = state[0][3], state[1][3], state[2][3], state[3][3]
+    
+def inv_swap_columns(state: [[int]]): # type: ignore
+    state[0][3], state[0][0], state[0][1], state[0][2] = state[0][0], state[0][1], state[0][2], state[0][3]
+    state[1][3], state[1][0], state[1][1], state[1][2] = state[1][0], state[1][1], state[1][2], state[1][3]
+    state[2][3], state[2][0], state[2][1], state[2][2] = state[2][0], state[2][1], state[2][2], state[2][3]
+    state[3][3], state[3][0], state[3][1], state[3][2] = state[3][0], state[3][1], state[3][2], state[3][3]
+    
+def inv_swap_rows(state: [[int]]): # type: ignore
+    state[3], state[0], state[1], state[2] = state[0], state[1], state[2], state[3]
+    
+def inv_mix_rows(state: [[int]]): # type: ignore
+    columns_to_rows(state)
+    inv_mix_columns(state)
+    rows_to_columns(state)
+    
+# Calliope static encryption ---------------------------------------------------------------------------------
+
+def calliope_static_encryption(data: bytes, key: bytes) -> bytes:
+    state = state_from_bytes(data)
+    key_schedule = key_expansion(key)
+    add_round_key(state, key_schedule, round=0)
+    
+    rounds = 10
+    
+    for round in range (1, rounds):
+        sub_bytes(state)
+        shift_rows(state)
+        shift_columns(state)
+        swap_rows(state)
+        swap_columns(state)
+        mix_rows(state)
+        mix_columns(state)
+        add_round_key(state, key_schedule, round)
+        
+    sub_bytes(state)
+    shift_rows(state)
+    shift_columns(state)
+    swap_rows(state)
+    swap_columns(state)
+    add_round_key(state, key_schedule, round=rounds)
+    
+    return bytes_from_state(state)
+
+# Calliope static decryption ---------------------------------------------------------------------------------
+
+def calliope_static_decryption(cipher: bytes, key: bytes) -> bytes:
+    rounds = 10
+
+    state = state_from_bytes(cipher)
+    key_schedule = key_expansion(key)
+    add_round_key(state, key_schedule, round=rounds)
+
+    for round in range(rounds-1, 0, -1):
+        inv_swap_columns(state)
+        inv_swap_rows(state)
+        inv_shift_columns(state)
+        inv_shift_rows(state)
+        inv_sub_bytes(state)
+        add_round_key(state, key_schedule, round)
+        inv_mix_columns(state)
+        inv_mix_rows(state)
+
+    inv_swap_columns(state)
+    inv_swap_rows(state)
+    inv_shift_columns(state)
+    inv_shift_rows(state)
+    inv_sub_bytes(state)
+    add_round_key(state, key_schedule, round=0)
+
+    return bytes_from_state(state)
+
+# Calliope random encryption ---------------------------------------------------------------------------------
+
+def calliope_random_decryption(data: bytes, key: bytes, selected: [int]) -> bytes: # type: ignore
+    state = state_from_bytes(data)
+    key_schedule = key_expansion(key)
+    add_round_key(state, key_schedule, round=0)
+    
+    rounds = 10
+    
+    for round in range (1, rounds):
+        sub_bytes(state)
+        shift_rows(state)
+        mix_columns(state)
+        add_round_key(state, key_schedule, round)
+        
+    sub_bytes(state)
+    shift_rows(state)
+    add_round_key(state, key_schedule, round=rounds)
+    
+    return bytes_from_state(state)
