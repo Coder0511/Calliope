@@ -1,8 +1,23 @@
-import json
-from flet import *
+from os import getenv
 from time import sleep
+from pathlib import Path
+import pyperclip
+from json import dump, load
+from dotenv import load_dotenv
+from core.operations.operations import process_string
+from core.operations.key_generator import generate_key
+from flet import Page, FilePickerResultEvent, Theme, \
+TextTheme, Container, Row, ResponsiveRow, WindowDragArea, \
+IconButton, icons, Radio, RadioGroup, Text, TextField, \
+border, padding, Column, FontWeight, colors, ElevatedButton, \
+ButtonStyle, FilePicker, Slider, Tabs, Tab
 
 def main(page: Page):
+    relative_path = f"{Path(__file__).parent}/../settings/config.json"
+    
+    load_dotenv()
+    randomorg_key = getenv("RANDOMORG_KEY")
+    
     def page_close():
         page.window_close()
         page.window_destroy()
@@ -86,25 +101,49 @@ def main(page: Page):
         page.update()
     
     def update_default_size(e):
-        with open("config.json", "w") as file:
+        with open(relative_path, "w") as file:
             default_size = int(e.control.value)
             data["size"] = default_size
-            json.dump(data, file)
+            dump(data, file)
     
     def update_default_theme(my_theme):
-        with open("config.json", "w") as file:
+        with open(relative_path, "w") as file:
             default_theme = my_theme
             data["theme"] = default_theme
-            json.dump(data, file)
+            dump(data, file)
     
     def update_default_route(my_route):
-        with open("config.json", "w") as file:
+        with open(relative_path, "w") as file:
             default_route = my_route
             data["route"] = default_route
-            json.dump(data, file)
+            dump(data, file)
+            
+    def text_section_set_text(self):
+        text_textField2.value = generate_key(randomorg_key)
+        page.update()
+        
+    def text_copy_to_clipboard(self):
+        pyperclip.copy(text_textField2.value)
+        row_Text_1.value = "Copiado!"
+        page.update()
     
-    with open("config.json", "r") as file:
-        data = json.load(file)
+    def file_section_set_text(self):
+        text_textField4.value = generate_key(randomorg_key)
+        page.update()
+        
+    def file_copy_to_clipboard(self):
+        pyperclip.copy(text_textField4.value)
+        row_Text_2.value = "Copiado!"
+        page.update()
+    
+    def process_message(self):
+        if len(text_textField1.value) > 0:
+            message = process_string(text_radio_1.value, text_radio_2.value, text_textField1.value, text_textField2.value)
+            editable.value = message
+            page.update()
+    
+    with open(relative_path, "r") as file:
+        data = load(file)
     
     default_size = data["size"]
     default_theme = data["theme"]
@@ -139,16 +178,18 @@ def main(page: Page):
         Radio(value="desencriptar", label=""),
         text_radio_1_text2
     ]))
+    text_radio_1.value = "encriptar"
 
     text_radio_2_text1 = Text("AES", size=default_size)
-    text_radio_2_text2 = Text("Mandel", size=default_size)
+    text_radio_2_text2 = Text("Calíope", size=default_size)
     
     text_radio_2 = RadioGroup(content=Row([
         Radio(value="aes", label=""),
         text_radio_2_text1,
-        Radio(value="mandel", label=""),
+        Radio(value="calíope", label=""),
         text_radio_2_text2
     ]))
+    text_radio_2.value = "aes"
 
     text_textField1 = TextField(
         width=500,
@@ -179,6 +220,17 @@ def main(page: Page):
     separator_1 = Text("\nProceso:", size=default_size+4)
     separator_2 = Text("\nAlgoritmo:", size=default_size+4)
 
+    elevatedButton_1 = ElevatedButton(text="Generar", style=ButtonStyle(animation_duration=500))
+    elevatedButton_1.on_click = text_section_set_text
+
+    elevatedButton_2 = ElevatedButton(text="Copiar", style=ButtonStyle(animation_duration=500))
+    elevatedButton_2.on_click = text_copy_to_clipboard
+    
+    row_Text_1 = Text(value="", color="green")
+    
+    operate_button_1 = ElevatedButton(text="Operar", style=ButtonStyle(animation_duration=500))
+    operate_button_1.on_click = process_message
+
     tab1_content = Container(
         content=Column([
             separator_1,
@@ -187,13 +239,14 @@ def main(page: Page):
             text_radio_2,
             text_textField2,
             Row([
-                ElevatedButton(text="Generar", style=ButtonStyle(animation_duration=500)),
-                ElevatedButton(text="Copiar", style=ButtonStyle(animation_duration=500))
+                elevatedButton_1,
+                elevatedButton_2,
+                row_Text_1
             ]),
             Text("\n"),
             Row([
                 text_textField1,
-                ElevatedButton(text="Operar", style=ButtonStyle(animation_duration=500)),
+                operate_button_1,
                 text_textField3
             ])
         ]),
@@ -212,16 +265,18 @@ def main(page: Page):
         Radio(value="desencriptar"),
         text_radio_3_text2
     ]))
+    text_radio_3.value = "encriptar"
 
     text_radio_4_text1 = Text("AES", size=default_size)
-    text_radio_4_text2 = Text("Mandel", size=default_size)
+    text_radio_4_text2 = Text("Calíope", size=default_size)
     
     text_radio_4 = RadioGroup(content=Row([
         Radio(value="aes"),
         text_radio_4_text1,
-        Radio(value="mandel"),
+        Radio(value="calíope"),
         text_radio_4_text2
     ]))
+    text_radio_4.value = "aes"
 
     text_textField4 = TextField(
         width=800,
@@ -262,7 +317,15 @@ def main(page: Page):
                 directory_path
             ]
         )
+    
+    elevatedButton_3 = ElevatedButton(text="Generar", style=ButtonStyle(animation_duration=500))
+    elevatedButton_3.on_click = file_section_set_text
 
+    elevatedButton_4 = ElevatedButton(text="Copiar", style=ButtonStyle(animation_duration=500))
+    elevatedButton_4.on_click = file_copy_to_clipboard
+    
+    row_Text_2 = Text(value="", color="green")
+    
     tab2_content = Container(
         content=Column([
             separator_3,
@@ -271,8 +334,9 @@ def main(page: Page):
             text_radio_4,
             text_textField4,
             Row([
-                ElevatedButton(text="Generar", style=ButtonStyle(animation_duration=500)),
-                ElevatedButton(text="Copiar", style=ButtonStyle(animation_duration=500))
+                elevatedButton_3,
+                elevatedButton_4,
+                row_Text_2
             ]),
             Text(""),
             file_picker,
@@ -347,6 +411,3 @@ def main(page: Page):
     page.add(tabs_list)
 
     page.update()
-
-if __name__ == "__main__":
-    app(target=main)
