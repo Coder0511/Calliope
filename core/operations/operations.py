@@ -1,3 +1,4 @@
+import time
 from copy import deepcopy
 from .sub_byte_strings import s_box, inv_s_box
 
@@ -383,3 +384,42 @@ def process_string(process, algorithm, message, key):
     y_operation = int(key[-2:])
     key = bytearray.fromhex(key[0:-6])
     return execute_calliope_decrypt(message, algorithm_int, x_operation, y_operation, key).decode("utf-8")
+
+def process_file(file_path, process, algorithm, key, save_path):
+    text = open(file_path, "r").read()
+    text = [text[i:i+16] for i in range(0, len(text), 16)]
+    start = time.time()
+    if process == "encriptar":
+        for i in range(0, len(text)):
+            text[i] = bytearray.fromhex(clean_string(text[i]))
+        if algorithm == "aes":
+            key = bytearray.fromhex(key[0:-6])
+            for i in range(0, len(text)):
+                text[i] = bytes.hex(aes_encryption(text[i], key))
+            end = time.time()
+            print(end-start)
+            return 
+        
+        algorithm_int = int(key[-6:-4])
+        x_operation = int(key[-4:-2])
+        y_operation = int(key[-2:])
+        key = bytearray.fromhex(key[0:-6])
+        for i in range(0, len(text)):
+            text[i] = bytes.hex(execute_calliope_encrypt(text[i], algorithm_int, x_operation, y_operation, key))
+        return 
+    
+    for i in range(0, len(text)):
+        text[i] = bytearray.fromhex(text[i])
+    if algorithm == "aes":
+        key = bytearray.fromhex(key[0:-6])
+        for i in range(0, len(text)):
+            text[i] = aes_decryption(text[i], key).decode("utf-8")
+        return 
+    
+    algorithm_int = int(key[-6:-4])
+    x_operation = int(key[-4:-2])
+    y_operation = int(key[-2:])
+    key = bytearray.fromhex(key[0:-6])
+    for i in range(0, len(text)):
+        text[i] = execute_calliope_decrypt(text[i], algorithm_int, x_operation, y_operation, key).decode("utf-8")
+    return

@@ -4,7 +4,7 @@ from pathlib import Path
 import pyperclip
 from json import dump, load
 from dotenv import load_dotenv
-from core.operations.operations import process_string
+from core.operations.operations import process_string, process_file
 from core.operations.key_generator import generate_key
 from flet import Page, FilePickerResultEvent, Theme, \
 TextTheme, Container, Row, ResponsiveRow, WindowDragArea, \
@@ -17,6 +17,8 @@ def main(page: Page):
     
     load_dotenv()
     randomorg_key = getenv("RANDOMORG_KEY")
+    
+    picked_file_path = Text("")
     
     def page_close():
         page.window_close()
@@ -38,6 +40,7 @@ def main(page: Page):
         return "system" 
     
     def pick_files_result(e: FilePickerResultEvent):
+        picked_file_path.value = e.files[0].path if e.files else ""
         selected_file.value = (
             ", ".join(map(lambda f: f.name, e.files)) if e.files else "Cancelado!"
         )
@@ -120,27 +123,30 @@ def main(page: Page):
             
     def text_section_set_text(self):
         text_textField2.value = generate_key(randomorg_key)
-        page.update()
+        text_textField2.update()
         
     def text_copy_to_clipboard(self):
         pyperclip.copy(text_textField2.value)
         row_Text_1.value = "Copiado!"
-        page.update()
+        row_Text_1.update()
     
     def file_section_set_text(self):
         text_textField4.value = generate_key(randomorg_key)
-        page.update()
+        text_textField4.update()
         
     def file_copy_to_clipboard(self):
         pyperclip.copy(text_textField4.value)
         row_Text_2.value = "Copiado!"
-        page.update()
+        row_Text_2.update()
     
     def process_message(self):
         if len(text_textField1.value) > 0:
             message = process_string(text_radio_1.value, text_radio_2.value, text_textField1.value, text_textField2.value)
             editable.value = message
-            page.update()
+            editable.update()
+            
+    def process_file_message(self):
+        process_file(picked_file_path.value ,text_radio_3.value, text_radio_4.value, text_textField4.value, directory_path.value)
     
     with open(relative_path, "r") as file:
         data = load(file)
@@ -285,7 +291,7 @@ def main(page: Page):
     )
 
     pick_file_dialog = FilePicker(on_result=pick_files_result)
-    selected_file = Text(value="Solo formato .txt, .pdf, .csv, .docx y .odt", selectable=True)
+    selected_file = Text(value="Solo formato .txt", selectable=True)
 
     page.overlay.append(pick_file_dialog)
 
@@ -326,6 +332,9 @@ def main(page: Page):
     
     row_Text_2 = Text(value="", color="green")
     
+    operate_button_2 = ElevatedButton(text="Operar", style=ButtonStyle(animation_duration=500))
+    operate_button_2.on_click = process_file_message
+    
     tab2_content = Container(
         content=Column([
             separator_3,
@@ -342,7 +351,7 @@ def main(page: Page):
             file_picker,
             save_file,
             Text("\n"),
-            ElevatedButton(text="Operar", style=ButtonStyle(animation_duration=500))
+            operate_button_2
         ]),
         padding=16
     )
