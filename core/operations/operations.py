@@ -361,6 +361,11 @@ def execute_calliope_decrypt(message, algorithm, x_operation, y_operation, key):
         return calliope_random_decryption(message, key, [x_operation, y_operation])
     return calliope_static_decryption(message, key)
 
+def save_file(path, lines):
+    with open(path, 'w') as file:
+        for line in lines:
+            file.write(line)
+
 def process_string(process, algorithm, message, key):
     if process == "encriptar":
         message = bytearray.fromhex(clean_string(message))
@@ -387,9 +392,12 @@ def process_string(process, algorithm, message, key):
 
 def process_file(file_path, process, algorithm, key, save_path):
     text = open(file_path, "r").read()
-    text = [text[i:i+16] for i in range(0, len(text), 16)]
+    name = (file_path.split("\\")[-1])[:-4]
+    path = f"{save_path}\\{name}-encrypted.txt" if (process=="encriptar") else f"{save_path}\\{name}-decrypted.txt"
+
     start = time.time()
     if process == "encriptar":
+        text = [text[i:i+16] for i in range(0, len(text), 16)]
         for i in range(0, len(text)):
             text[i] = bytearray.fromhex(clean_string(text[i]))
         if algorithm == "aes":
@@ -398,7 +406,7 @@ def process_file(file_path, process, algorithm, key, save_path):
                 text[i] = bytes.hex(aes_encryption(text[i], key))
             end = time.time()
             print(end-start)
-            return 
+            return save_file(path, text)
         
         algorithm_int = int(key[-6:-4])
         x_operation = int(key[-4:-2])
@@ -406,15 +414,20 @@ def process_file(file_path, process, algorithm, key, save_path):
         key = bytearray.fromhex(key[0:-6])
         for i in range(0, len(text)):
             text[i] = bytes.hex(execute_calliope_encrypt(text[i], algorithm_int, x_operation, y_operation, key))
-        return 
+        end = time.time()
+        print(end-start)
+        return save_file(path, text)
     
+    text = [text[i:i+32] for i in range(0, len(text), 32)]
     for i in range(0, len(text)):
         text[i] = bytearray.fromhex(text[i])
     if algorithm == "aes":
         key = bytearray.fromhex(key[0:-6])
         for i in range(0, len(text)):
             text[i] = aes_decryption(text[i], key).decode("utf-8")
-        return 
+        end = time.time()
+        print(end-start)
+        return save_file(path, text)
     
     algorithm_int = int(key[-6:-4])
     x_operation = int(key[-4:-2])
@@ -422,4 +435,6 @@ def process_file(file_path, process, algorithm, key, save_path):
     key = bytearray.fromhex(key[0:-6])
     for i in range(0, len(text)):
         text[i] = execute_calliope_decrypt(text[i], algorithm_int, x_operation, y_operation, key).decode("utf-8")
-    return
+    end = time.time()
+    print(end-start)
+    return save_file(path, text)
