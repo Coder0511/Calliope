@@ -10,7 +10,7 @@ from flet import Page, FilePickerResultEvent, Theme, \
 TextTheme, Container, Row, ResponsiveRow, WindowDragArea, \
 IconButton, icons, Radio, RadioGroup, Text, TextField, \
 border, padding, Column, FontWeight, colors, ElevatedButton, \
-ButtonStyle, FilePicker, Slider, Tabs, Tab
+ButtonStyle, FilePicker, Slider, Tabs, Tab, ProgressBar
 
 def main(page: Page):
     relative_path = f"{Path(__file__).parent}/../settings/config.json"
@@ -146,8 +146,12 @@ def main(page: Page):
             editable.update()
             
     def process_file_message(self):
+        progress_bar.visible = True
+        progress_bar.update()
         process_file(picked_file_path.value ,text_radio_3.value, text_radio_4.value, text_textField4.value, directory_path.value)
-    
+        progress_bar.visible = False
+        progress_bar.update()
+        
     with open(relative_path, "r") as file:
         data = load(file)
     
@@ -334,6 +338,9 @@ def main(page: Page):
     
     operate_button_2 = ElevatedButton(text="Operar", style=ButtonStyle(animation_duration=500))
     operate_button_2.on_click = process_file_message
+
+    progress_bar = ProgressBar(width=200, color="#9ecaff", bgcolor="#eeeeee")
+    progress_bar.visible = False
     
     tab2_content = Container(
         content=Column([
@@ -351,7 +358,11 @@ def main(page: Page):
             file_picker,
             save_file,
             Text("\n"),
-            operate_button_2
+            Row([
+                operate_button_2,
+                Text("  "),
+                progress_bar
+            ])
         ]),
         padding=16
     )
