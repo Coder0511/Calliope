@@ -1,0 +1,7 @@
+https://linear.app
+https://app.diagrams.net
+https://flet.dev
+https://www.python.org
+https://www.json.org/json-en.html
+https://flutter.dev
+https://code.visualstudio.com
