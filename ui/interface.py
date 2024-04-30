@@ -206,7 +206,7 @@ def main(page: Page):
         height=273,
         multiline=True,
         min_lines=1,
-        hint_text="Escribe algo aquí",
+        hint_text="Escribe algo aquí (sólo 16 caracteres para encriptar y 32 para desencriptar)",
         text_size=default_size
     )
 
