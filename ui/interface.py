@@ -161,7 +161,7 @@ def main(page: Page):
 
     page.theme_mode = default_theme
     page.window_title_bar_hidden = True
-    page.window_min_height = 950
+    page.window_min_height = 1050
     page.window_min_width = 1400
     page.window_width = 1401
     page.window_height = 951
@@ -206,7 +206,7 @@ def main(page: Page):
         height=273,
         multiline=True,
         min_lines=1,
-        hint_text="Escribe algo aquí (sólo 16 caracteres para encriptar y 32 para desencriptar)",
+        hint_text="Cadena de 128 bits",
         text_size=default_size
     )
 
