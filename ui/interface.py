@@ -10,7 +10,7 @@ from flet import Page, FilePickerResultEvent, Theme, \
 TextTheme, Container, Row, ResponsiveRow, WindowDragArea, \
 IconButton, icons, Radio, RadioGroup, Text, TextField, \
 border, padding, Column, FontWeight, colors, ElevatedButton, \
-ButtonStyle, FilePicker, Slider, Tabs, Tab, ProgressBar
+ButtonStyle, FilePicker, Slider, Tabs, Tab, ProgressBar, ClipBehavior
 
 def main(page: Page):
     relative_path = f"{Path(__file__).parent}/../settings/config.json"
@@ -101,6 +101,11 @@ def main(page: Page):
         text_textField4.text_size = default_size
         selected_file.size = default_size
         directory_path.size = default_size
+        config_separator.size = default_size + 4
+        config_separator_1.size = default_size + 2
+        config_help_1.size = default_size
+        config_separator_2.size = default_size + 2
+        config_help_2.size = default_size
         page.update()
     
     def update_default_size(e):
@@ -161,7 +166,7 @@ def main(page: Page):
 
     page.theme_mode = default_theme
     page.window_title_bar_hidden = True
-    page.window_min_height = 1050
+    page.window_min_height = 950
     page.window_min_width = 1400
     page.window_width = 1401
     page.window_height = 951
@@ -394,13 +399,26 @@ def main(page: Page):
         on_change_end=update_default_size
     )
 
+    config_separator = Text("\nSobre la aplicación", size=default_size+4)
+
+    config_separator_1 = Text("\nPrimera pestaña:", size=default_size+2)
+    config_help_1 = Text("Solo se aceptan cadenas de 128 bits, es decir, 16 caracteres para encriptar y 16 en hexadecimal (es decir, 32 de longitud) para desencriptar.", size=default_size)
+    
+    config_separator_2 = Text("\nSegunda pestaña:", size=default_size+2)
+    config_help_2 = Text("Solo se aceptan ficheros de texto cuyo contenido tenga una cantidad de caracteres múltiplo de 16. Esta aplicación no está destinada a codificar o descodificar cuando el texto no tenga tamaños múltiplos de 16. El propósito es demostrar que es viable su uso en términos de tiempo de ejecución.", size=default_size)
+
     tab3_content = Container(
         content=Column([
             theme_text,
             text_radio_5,
             Text("\n\n"),
             sample_text, 
-            slider1
+            slider1,
+            config_separator,
+            config_separator_1,
+            config_help_1,
+            config_separator_2,
+            config_help_2
         ]),
         padding=16
     )
