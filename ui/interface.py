@@ -235,7 +235,7 @@ def main(page: Page):
     )
 
     separator_1 = Text("\nProceso:", size=default_size+4)
-    separator_2 = Text("\nAlgoritmo:", size=default_size+4)
+    separator_2 = Text("\nEsquema:", size=default_size+4)
 
     elevatedButton_1 = ElevatedButton(text="Generar", style=ButtonStyle(animation_duration=500))
     elevatedButton_1.on_click = text_section_set_text
@@ -271,7 +271,7 @@ def main(page: Page):
     )
 
     separator_3 = Text("\nProceso:", size=default_size+4)
-    separator_4 = Text("\nAlgoritmo:", size=default_size+4)
+    separator_4 = Text("\nEsquema:", size=default_size+4)
 
     text_radio_3_text1 = Text("Encriptar", size=default_size)
     text_radio_3_text2 = Text("Desencriptar", size=default_size)
