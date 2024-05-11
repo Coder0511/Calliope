@@ -404,7 +404,7 @@ def main(page: Page):
     config_separator = Text("\nSobre la aplicación", size=default_size+4)
 
     config_separator_1 = Text("\nPrimera pestaña:", size=default_size+2)
-    config_help_1 = Text("Solo se aceptan cadenas de 128 bits, es decir, 16 caracteres para encriptar y 16 en hexadecimal (es decir, 32 de longitud) para desencriptar.", size=default_size)
+    config_help_1 = Text("Solo se aceptan cadenas de 128 bits, es decir, 16 caracteres para encriptar y 16 números en hexadecimal (es decir, 32 de longitud) para desencriptar.", size=default_size)
     
     config_separator_2 = Text("\nSegunda pestaña:", size=default_size+2)
     config_help_2 = Text("Solo se aceptan ficheros de texto cuyo contenido tenga una cantidad de caracteres múltiplo de 16. Esta aplicación no está destinada a codificar o descodificar cuando el texto no tenga tamaños múltiplos de 16. El propósito es demostrar que es viable su uso en términos de tiempo de ejecución.", size=default_size)
