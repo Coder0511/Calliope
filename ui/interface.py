@@ -106,6 +106,8 @@ def main(page: Page):
         config_help_1.size = default_size
         config_separator_2.size = default_size + 2
         config_help_2.size = default_size
+        config_separator_3.size = default_size + 2
+        config_help_3.size = default_size
         page.update()
     
     def update_default_size(e):
@@ -407,6 +409,9 @@ def main(page: Page):
     config_separator_2 = Text("\nSegunda pestaña:", size=default_size+2)
     config_help_2 = Text("Solo se aceptan ficheros de texto cuyo contenido tenga una cantidad de caracteres múltiplo de 16. Esta aplicación no está destinada a codificar o descodificar cuando el texto no tenga tamaños múltiplos de 16. El propósito es demostrar que es viable su uso en términos de tiempo de ejecución.", size=default_size)
 
+    config_separator_3 = Text("\nGeneración de claves:", size=default_size+2)
+    config_help_3 = Text("Es necesario disponer de conexión a internet para poder generar claves automáticamente. Generadas gracias a Random.org, una página web que produce números aleatorios en función de sonido atmosférico.", size=default_size)
+
     tab3_content = Container(
         content=Column([
             theme_text,
@@ -418,7 +423,9 @@ def main(page: Page):
             config_separator_1,
             config_help_1,
             config_separator_2,
-            config_help_2
+            config_help_2,
+            config_separator_3,
+            config_help_3
         ]),
         padding=16
     )
