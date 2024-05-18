@@ -2,13 +2,13 @@ Calliope is an encryption algorithm based on AES with the purpose of being more 
 
 Disclaimer: this is just a demo for the encryption especification I made. It does not stand out for being optimized.
 
-Another Disclaimer: only accepts 128 bits (key and text) and files whose content length is multiple of 128 
+Another Disclaimer: only accepts 128 bits (text) and files whose content length is multiple of 16
 
 Requirements:
 
 - Python ^3.11.9
 
-- Random.org api key
+- Random.org api key in case you need one. My key's in the .env file, you can take it.
 
 - Flet ---> `pip install flet`
 
