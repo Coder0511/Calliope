@@ -19,3 +19,5 @@ Requirements:
 Enjoy.
 
 Some of the functions code for AES implementation were obtained from Cyrill Gössi's repo: https://github.com/cgossi/fundamental_cryptography_with_python 
+
+ANOTHER DISCLAIMER: Kalliope has licence (the encryption specification, not this repos code), but the only thing you have to do is credit me. Yeah, that's all!! Have a nice day (⁠ﾉ⁠◕⁠ヮ⁠◕⁠)⁠ﾉ⁠*⁠.⁠✧
